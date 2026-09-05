@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Young Professionals Forum &mdash; Ikola, Lagos</title>
+<link rel="icon" href="assets/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<style>
+  :root{
+    --ink:#14241C;
+    --green-deep:#1F6B33;
+    --green-bright:#7CC142;
+    --green-pale:#EAF5E1;
+    --green-line:#D3E6C6;
+    --white:#FFFFFF;
+    --max:1100px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:'Work Sans', sans-serif;
+    color:var(--ink);
+    background:var(--white);
+    line-height:1.5;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    margin:0;
+    line-height:1.12;
+  }
+  a{color:inherit;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+  img{max-width:100%; display:block;}
+
+  /* Skip link for keyboard/screen reader users */
+  .skip-link{
+    position:absolute; left:-999px; top:0; background:var(--green-deep); color:#fff;
+    padding:10px 16px; z-index:200; border-radius:0 0 6px 0;
+  }
+  .skip-link:focus{left:0;}
+
+  :focus-visible{outline:3px solid var(--green-deep); outline-offset:2px;}
+
+  /* ---------- Header ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.92);
+    backdrop-filter:saturate(1.1) blur(6px);
+    border-bottom:1px solid var(--green-line);
+  }
+  .nav{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 28px;
+  }
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none;}
+  .brand img{height:38px; width:38px; object-fit:contain;}
+  .brand span{font-family:'Fraunces', serif; font-weight:600; font-size:1.05rem; color:var(--ink);}
+  .nav-links{display:flex; align-items:center; gap:28px;}
+  .nav-links a.section-link{
+    text-decoration:none; font-weight:500; font-size:0.95rem; color:var(--ink);
+    padding-bottom:2px; border-bottom:2px solid transparent;
+  }
+  .nav-links a.section-link:hover{border-bottom:2px solid var(--green-bright);}
+  .nav-actions{display:flex; gap:10px;}
+  .btn{
+    font-family:'Work Sans', sans-serif;
+    font-weight:600; font-size:0.92rem;
+    padding:10px 20px; border-radius:3px; border:1.5px solid var(--green-deep);
+    cursor:pointer; text-decoration:none; display:inline-block;
+    transition:transform .15s ease;
+  }
+  .btn:hover{transform:translateY(-1px);}
+  .btn-solid{background:var(--green-deep); color:#fff;}
+  .btn-solid:hover{background:#195828;}
+  .btn-ghost{background:transparent; color:var(--green-deep);}
+  .btn-ghost:hover{background:var(--green-pale);}
+  .menu-toggle{display:none; background:none; border:none; cursor:pointer; padding:6px;}
+  .menu-toggle span{display:block; width:24px; height:2px; background:var(--ink); margin:5px 0;}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:80px 0 70px;
+    background:linear-gradient(180deg, var(--white) 60%, var(--green-pale) 100%);
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid; grid-template-columns:1.15fr 0.85fr; gap:56px; align-items:center;
+  }
+  .eyebrow-tag{
+    display:inline-flex; align-items:center; gap:8px;
+    font-size:0.88rem; font-weight:600; color:var(--green-deep);
+    margin-bottom:18px;
+  }
+  .eyebrow-tag::before{content:""; width:8px; height:8px; border-radius:50%; background:var(--green-bright);}
+  .hero h1{
+    font-size:clamp(2.3rem, 4.2vw, 3.4rem);
+    color:var(--ink);
+    letter-spacing:-0.01em;
+  }
+  .hero p.lede{
+    margin-top:22px; font-size:1.15rem; max-width:46ch; color:#3A4A3E;
+  }
+  .hero-ctas{display:flex; gap:14px; margin-top:34px; flex-wrap:wrap;}
+  .hero-visual{
+    position:relative; display:flex; align-items:center; justify-content:center;
+  }
+  .hero-visual .ring{
+    position:absolute; width:340px; height:340px; border-radius:50%;
+    border:1.5px solid var(--green-line);
+    animation:pulse-ring 3.5s ease-in-out infinite;
+  }
+  @keyframes pulse-ring{
+    0%,100%{transform:scale(1); opacity:0.7;}
+    50%{transform:scale(1.05); opacity:1;}
+  }
+  .hero-visual img{
+    width:230px; height:230px; object-fit:contain; position:relative; z-index:2;
+    animation:logo-in .9s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes logo-in{
+    from{opacity:0; transform:scale(.85) translateY(10px);}
+    to{opacity:1; transform:scale(1) translateY(0);}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .hero-visual img, .hero-visual .ring{animation:none;}
+  }
+
+  /* ---------- Section shared ---------- */
+  section{padding:88px 0;}
+  .section-head{max-width:640px; margin-bottom:48px;}
+  .section-head p{color:#4A5A4D; margin-top:14px; font-size:1.05rem;}
+  h2{font-size:clamp(1.7rem, 2.8vw, 2.25rem);}
+
+  /* ---------- About ---------- */
+  .about-grid{
+    display:grid; grid-template-columns:1fr 1fr; gap:0;
+    border-top:1px solid var(--green-line);
+  }
+  .about-col{padding:36px 40px 36px 0; border-bottom:1px solid var(--green-line);}
+  .about-col + .about-col{padding-left:40px; border-left:1px solid var(--green-line);}
+  .about-col h3{font-size:1.3rem; color:var(--green-deep); margin-bottom:14px;}
+  .about-col p{color:#33422F; font-size:1.02rem;}
+
+  /* ---------- Pillars ---------- */
+  .pillar-grid{
+    display:grid; grid-template-columns:repeat(3, 1fr); gap:0;
+    border-top:1px solid var(--green-line); border-left:1px solid var(--green-line);
+  }
+  .pillar{
+    padding:32px 28px; border-right:1px solid var(--green-line); border-bottom:1px solid var(--green-line);
+  }
+  .pillar-num{
+    font-family:'Fraunces', serif; font-size:1.6rem; color:var(--green-bright);
+    -webkit-text-stroke:1px var(--green-deep); margin-bottom:14px;
+  }
+  .pillar h3{font-size:1.15rem; margin-bottom:10px; color:var(--ink);}
+  .pillar p{margin:0; color:#42513E; font-size:0.98rem;}
+
+  /* ---------- Groups ---------- */
+  .groups-bg{background:var(--green-pale);}
+  .group-list{border-top:1px solid var(--green-line);}
+  .group-row{
+    display:grid; grid-template-columns:200px 1fr; gap:28px;
+    padding:26px 0; border-bottom:1px solid var(--green-line);
+  }
+  .group-row h3{font-size:1.15rem; font-weight:600; color:var(--ink);}
+  .group-row p{margin:0; color:#42513E;}
+
+  /* ---------- Districts ---------- */
+  .district-grid{
+    display:grid; grid-template-columns:repeat(4, 1fr); gap:0;
+    border-top:1px solid var(--green-line); border-left:1px solid var(--green-line);
+  }
+  .district{
+    padding:28px 22px; border-right:1px solid var(--green-line); border-bottom:1px solid var(--green-line);
+    background:var(--white);
+  }
+  .district-pin{font-size:1.3rem; margin-bottom:12px;}
+  .district h3{font-size:1.05rem; margin-bottom:8px; color:var(--ink);}
+  .district-stop{margin:0; color:var(--green-deep); font-weight:600; font-size:0.92rem;}
+  #cluster-map{
+    width:100%; height:380px; border:1px solid var(--green-line); margin-bottom:32px;
+    filter:saturate(0.9);
+  }
+  .leaflet-popup-content{font-family:'Work Sans', sans-serif; font-size:0.9rem;}
+  .leaflet-popup-content b{font-family:'Fraunces', serif; font-weight:600;}
+
+  /* ---------- Join banner ---------- */
+  .join{
+    background:var(--ink); color:#fff; border-radius:4px;
+    padding:56px 48px; display:flex; justify-content:space-between; align-items:center; gap:32px; flex-wrap:wrap;
+  }
+  .join h2{color:#fff; max-width:14ch;}
+  .join p{color:#C9D9C3; margin-top:10px; max-width:42ch;}
+  .join .btn-solid{background:var(--green-bright); border-color:var(--green-bright); color:var(--ink);}
+  .join .btn-solid:hover{background:#8FD154;}
+
+  /* ---------- Footer ---------- */
+  footer{border-top:1px solid var(--green-line); padding:48px 0 36px; background:var(--white);}
+  .foot-grid{display:flex; justify-content:space-between; gap:32px; flex-wrap:wrap;}
+  .foot-brand{display:flex; align-items:center; gap:10px;}
+  .foot-brand img{height:30px; width:30px;}
+  .foot-meta{color:#5A6B57; font-size:0.92rem; max-width:32ch;}
+  .foot-links{display:flex; gap:40px; flex-wrap:wrap;}
+  .foot-links div h4{font-size:0.85rem; text-transform:none; margin-bottom:10px; color:var(--ink);}
+  .foot-links a{display:block; color:#4A5A47; text-decoration:none; font-size:0.92rem; margin-bottom:8px;}
+  .foot-links a:hover{color:var(--green-deep);}
+  .foot-bottom{margin-top:40px; padding-top:20px; border-top:1px solid var(--green-line); font-size:0.85rem; color:#7A8A77;}
+
+  /* ---------- Modal ---------- */
+  .modal-overlay{
+    position:fixed; inset:0; background:rgba(20,36,28,0.55);
+    display:none; align-items:center; justify-content:center; padding:20px; z-index:100;
+  }
+  .modal-overlay.open{display:flex;}
+  .modal{
+    background:#fff; border-radius:6px; max-width:420px; width:100%;
+    padding:36px 32px; position:relative; max-height:88vh; overflow-y:auto;
+  }
+  .modal h3{font-size:1.4rem; margin-bottom:6px;}
+  .modal .sub{color:#5A6B57; font-size:0.92rem; margin-bottom:22px;}
+  .modal-close{
+    position:absolute; top:16px; right:16px; background:none; border:none;
+    font-size:1.4rem; cursor:pointer; color:var(--ink); line-height:1;
+  }
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:0.88rem; font-weight:600; margin-bottom:6px;}
+  .field input, .field select, .field textarea{
+    width:100%; padding:11px 12px; border:1.5px solid var(--green-line); border-radius:3px;
+    font-family:'Work Sans', sans-serif; font-size:0.95rem; background:#FBFDF9;
+  }
+  .field input:focus, .field select:focus, .field textarea:focus{border-color:var(--green-deep);}
+  .modal .btn{width:100%; text-align:center; margin-top:6px;}
+  .switch-form{font-size:0.88rem; color:#5A6B57; margin-top:18px; text-align:center;}
+  .switch-form button{background:none; border:none; color:var(--green-deep); font-weight:600; cursor:pointer; padding:0;}
+  .form-note{
+    background:var(--green-pale); border-left:3px solid var(--green-bright);
+    padding:10px 12px; font-size:0.82rem; color:#33422F; border-radius:0 3px 3px 0; margin-top:18px;
+  }
+  .form-error{
+    display:none; background:#FDEDEC; border-left:3px solid #C0392B;
+    padding:10px 12px; font-size:0.85rem; color:#8B1E14; border-radius:0 3px 3px 0; margin-bottom:16px;
+  }
+  .form-error.show{display:block;}
+  .success-msg{display:none; text-align:center; padding:12px 0;}
+  .success-msg.show{display:block;}
+  .success-msg .check{
+    width:52px; height:52px; border-radius:50%; background:var(--green-pale); color:var(--green-deep);
+    display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:1.6rem;
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 860px){
+    .hero-grid{grid-template-columns:1fr;}
+    .hero-visual{order:-1; margin-bottom:8px;}
+    .hero-visual .ring{width:220px; height:220px;}
+    .hero-visual img{width:150px; height:150px;}
+    .about-grid{grid-template-columns:1fr;}
+    .about-col, .about-col + .about-col{padding:28px 0; border-left:none;}
+    .group-row{grid-template-columns:1fr; gap:8px;}
+    .pillar-grid{grid-template-columns:1fr;}
+    .district-grid{grid-template-columns:1fr 1fr;}
+    .menu-toggle{display:block;}
+    .nav-links{
+      position:absolute; top:100%; left:0; right:0; background:#fff;
+      flex-direction:column; align-items:flex-start; gap:0;
+      border-bottom:1px solid var(--green-line);
+      display:none;
+    }
+    .nav-links.open{display:flex;}
+    .nav-links a.section-link{padding:14px 28px; width:100%; border-bottom:1px solid var(--green-line);}
+    .nav-actions{padding:16px 28px; width:100%;}
+    .nav-actions .btn{flex:1; text-align:center;}
+    .join{flex-direction:column; text-align:center; align-items:center;}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header>
+  <div class="nav wrap">
+    <a class="brand" href="#top">
+      <img src="assets/logo.png" alt="Young Professionals Forum logo">
+      <span>Young Professionals Forum</span>
+    </a>
+    <nav class="nav-links" id="navLinks">
+      <a class="section-link" href="#about">About</a>
+      <a class="section-link" href="#pillars">Why Join</a>
+      <a class="section-link" href="#groups">Groups</a>
+      <a class="section-link" href="#districts">Find a Cluster</a>
+      <a class="section-link" href="#join">Get Involved</a>
+      <div class="nav-actions" id="navActions">
+        <button class="btn btn-ghost" onclick="openModal('login')">Log in</button>
+        <button class="btn btn-solid" onclick="openModal('signup')">Sign up</button>
+      </div>
+    </nav>
+    <button class="menu-toggle" id="menuToggle" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- Hero -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="eyebrow-tag">Ikola, Lagos</div>
+        <h1>A home for young professionals growing in faith, together.</h1>
+        <p class="lede">Young Professionals Forum brings young adults across Ikola into one community &mdash; for fellowship, mentorship, and purposeful living, on and off the job.</p>
+        <div class="hero-ctas">
+          <button class="btn btn-solid" onclick="openModal('signup')">Join the Forum</button>
+          <a class="btn btn-ghost" href="#groups">See our groups</a>
+        </div>
+      </div>
+      <div class="hero-visual">
+        <div class="ring" aria-hidden="true"></div>
+        <img src="assets/logo.png" alt="">
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Why we gather</h2>
+        <p>We're a community of young adults navigating early careers and everyday life &mdash; holding on to faith while we build.</p>
+      </div>
+      <div class="about-grid">
+        <div class="about-col">
+          <h3>Our Mission</h3>
+          <p>To raise young professionals in Ikola who reflect Christ in their careers, relationships, and communities &mdash; equipped, accountable, and unashamed of their faith.</p>
+        </div>
+        <div class="about-col">
+          <h3>Our Vision</h3>
+          <p>A thriving network of purpose-driven young adults in Ikola and beyond, known for excellence at work and depth in faith.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pillars -->
+  <section id="pillars" class="groups-bg">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>What you get as a member</h2>
+        <p>Three things we're building the Forum around.</p>
+      </div>
+      <div class="pillar-grid">
+        <div class="pillar">
+          <div class="pillar-num">01</div>
+          <h3>Community</h3>
+          <p>A network of young professionals in Ikola to do life with &mdash; not just Sundays, but through the week.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">02</div>
+          <h3>Growth</h3>
+          <p>Mentorship, skills sessions, and career conversations that help you grow at work, not just in church.</p>
+        </div>
+        <div class="pillar">
+          <div class="pillar-num">03</div>
+          <h3>Purpose</h3>
+          <p>Faith and career held together &mdash; excellence at work as an expression of what we believe, not separate from it.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Groups -->
+  <section id="groups">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Small groups &amp; departments</h2>
+        <p>Every member finds a place to serve and grow. Here's where you can plug in.</p>
+      </div>
+      <div class="group-list">
+        <div class="group-row">
+          <h3>Media &amp; Publicity</h3>
+          <p>Tells the Forum's story &mdash; photography, social media, livestreams, and design for every event.</p>
+        </div>
+        <div class="group-row">
+          <h3>Prayer Band</h3>
+          <p>Covers the Forum in prayer, leads intercession before gatherings, and supports members through personal seasons.</p>
+        </div>
+        <div class="group-row">
+          <h3>Choir &amp; Music</h3>
+          <p>Leads worship at every service and rehearses weekly &mdash; open to singers and instrumentalists alike.</p>
+        </div>
+        <div class="group-row">
+          <h3>Welfare</h3>
+          <p>Looks out for members' wellbeing &mdash; check-ins, hospital visits, and support during hard times.</p>
+        </div>
+        <div class="group-row">
+          <h3>Ushering &amp; Protocol</h3>
+          <p>Sets the tone for every gathering &mdash; welcoming guests and keeping services running smoothly.</p>
+        </div>
+        <div class="group-row">
+          <h3>Outreach &amp; Evangelism</h3>
+          <p>Takes the Forum beyond Ikola &mdash; community outreach, campus visits, and sharing the faith.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Districts -->
+  <section id="districts" class="groups-bg">
+    <div class="wrap">
+      <div class="section-head">
+        <h2>Find a cluster</h2>
+        <p>The Forum meets across four district clusters in and around Ikola. Find the one nearest you.</p>
+      </div>
+      <div id="cluster-map" role="img" aria-label="Map showing the four YPF Ikola district clusters"></div>
+      <div class="district-grid">
+        <div class="district">
+          <div class="district-pin" aria-hidden="true">&#128205;</div>
+          <h3>Ajasa District Cluster</h3>
+          <p class="district-stop">Command / White House Bus Stop</p>
+        </div>
+        <div class="district">
+          <div class="district-pin" aria-hidden="true">&#128205;</div>
+          <h3>Olakitan District Cluster</h3>
+          <p class="district-stop">Jerusalem / Oke Isagun Bus Stop</p>
+        </div>
+        <div class="district">
+          <div class="district-pin" aria-hidden="true">&#128205;</div>
+          <h3>Courage District Cluster</h3>
+          <p class="district-stop">Werewere / Isoto Bus Stop</p>
+        </div>
+        <div class="district">
+          <div class="district-pin" aria-hidden="true">&#128205;</div>
+          <h3>Ikola District Cluster</h3>
+          <p class="district-stop">Ikola Ilumo / Ikola Bus Stop</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Join banner -->
+  <section id="join">
+    <div class="wrap">
+      <div class="join">
+        <div>
+          <h2>Ready to belong somewhere?</h2>
+          <p>Sign up in a minute and a coordinator will reach out to help you find your group.</p>
+        </div>
+        <button class="btn btn-solid" onclick="openModal('signup')">Join the Forum</button>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="foot-brand">
+          <img src="assets/logo.png" alt="Young Professionals Forum logo">
+          <span style="font-family:'Fraunces',serif; font-weight:600;">Young Professionals Forum</span>
+        </div>
+        <p class="foot-meta">A young adult fellowship community in Ikola, Lagos, Nigeria.</p>
+      </div>
+      <div class="foot-links">
+        <div>
+          <h4>Explore</h4>
+          <a href="#about">About</a>
+          <a href="#groups">Groups</a>
+          <a href="#join">Get Involved</a>
+        </div>
+        <div>
+          <h4>Connect</h4>
+          <a href="mailto:hello@ypfikola.org">hello@ypfikola.org</a>
+          <a href="#">WhatsApp community</a>
+          <a href="#">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="foot-bottom">&copy; <span id="year"></span> Young Professionals Forum, Ikola. All rights reserved.</div>
+  </div>
+</footer>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <button class="modal-close" aria-label="Close" onclick="closeModal()">&times;</button>
+
+    <div id="signupForm">
+      <h3>Join the Forum</h3>
+      <p class="sub">Create your member account.</p>
+      <div class="form-error" id="su-error"></div>
+      <form onsubmit="return handleSignup(event)">
+        <div class="field">
+          <label for="su-name">Full name</label>
+          <input id="su-name" type="text" required>
+        </div>
+        <div class="field">
+          <label for="su-email">Email address</label>
+          <input id="su-email" type="email" required>
+        </div>
+        <div class="field">
+          <label for="su-phone">Phone number</label>
+          <input id="su-phone" type="tel" required>
+        </div>
+        <div class="field">
+          <label for="su-password">Password</label>
+          <input id="su-password" type="password" minlength="6" required>
+        </div>
+        <div class="field">
+          <label for="su-district">District cluster</label>
+          <select id="su-district">
+            <option>Not sure yet</option>
+            <option>Ajasa District Cluster</option>
+            <option>Olakitan District Cluster</option>
+            <option>Courage District Cluster</option>
+            <option>Ikola District Cluster</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="su-group">Group you'd like to join</label>
+          <select id="su-group">
+            <option>Not sure yet</option>
+            <option>Media &amp; Publicity</option>
+            <option>Prayer Band</option>
+            <option>Choir &amp; Music</option>
+            <option>Welfare</option>
+            <option>Ushering &amp; Protocol</option>
+            <option>Outreach &amp; Evangelism</option>
+          </select>
+        </div>
+        <button class="btn btn-solid" type="submit" id="su-submit">Create account</button>
+      </form>
+      <div class="switch-form">Already a member? <button onclick="switchForm('login')">Log in</button></div>
+      <div class="form-note">You'll get a confirmation email from Supabase &mdash; verify it before logging in.</div>
+    </div>
+
+    <div id="loginForm" style="display:none;">
+      <h3>Welcome back</h3>
+      <p class="sub">Log in to your member account.</p>
+      <div class="form-error" id="li-error"></div>
+      <form onsubmit="return handleLogin(event)">
+        <div class="field">
+          <label for="li-email">Email address</label>
+          <input id="li-email" type="email" required>
+        </div>
+        <div class="field">
+          <label for="li-pass">Password</label>
+          <input id="li-pass" type="password" required>
+        </div>
+        <button class="btn btn-solid" type="submit" id="li-submit">Log in</button>
+      </form>
+      <div class="switch-form">New here? <button onclick="switchForm('signup')">Join the Forum</button></div>
+    </div>
+
+    <div id="successMsg" class="success-msg">
+      <div class="check">&#10003;</div>
+      <h3 id="successTitle" style="text-align:center;">You're in!</h3>
+      <p class="sub" id="successSub" style="text-align:center;">A coordinator will reach out shortly.</p>
+      <button class="btn btn-ghost" style="width:100%;" onclick="closeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="assets/supabase-client.js"></script>
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const overlay = document.getElementById('menuToggle');
+  const navLinks = document.getElementById('navLinks');
+  document.getElementById('menuToggle').addEventListener('click', function(){
+    const isOpen = navLinks.classList.toggle('open');
+    this.setAttribute('aria-expanded', isOpen);
+  });
+  navLinks.querySelectorAll('.section-link').forEach(function(link){
+    link.addEventListener('click', function(){ navLinks.classList.remove('open'); });
+  });
+
+  function openModal(which){
+    document.getElementById('modalOverlay').classList.add('open');
+    switchForm(which);
+    document.getElementById('successMsg').classList.remove('show');
+    document.getElementById(which === 'login' ? 'loginForm' : 'signupForm').style.display = 'block';
+  }
+  function closeModal(){
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function switchForm(which){
+    document.getElementById('signupForm').style.display = which === 'signup' ? 'block' : 'none';
+    document.getElementById('loginForm').style.display = which === 'login' ? 'block' : 'none';
+    document.getElementById('successMsg').classList.remove('show');
+  }
+  function setLoading(btnId, loading, label){
+    var btn = document.getElementById(btnId);
+    btn.disabled = loading;
+    btn.textContent = loading ? 'Please wait…' : label;
+  }
+  function showError(elId, msg){
+    var el = document.getElementById(elId);
+    el.textContent = msg;
+    el.classList.add('show');
+  }
+  function clearError(elId){
+    document.getElementById(elId).classList.remove('show');
+  }
+
+  async function handleSignup(e){
+    e.preventDefault();
+    clearError('su-error');
+    var name = document.getElementById('su-name').value.trim();
+    var email = document.getElementById('su-email').value.trim();
+    var phone = document.getElementById('su-phone').value.trim();
+    var password = document.getElementById('su-password').value;
+    var district = document.getElementById('su-district').value;
+    var group = document.getElementById('su-group').value;
+
+    setLoading('su-submit', true, 'Create account');
+    var { data, error } = await sb.auth.signUp({
+      email: email,
+      password: password,
+      options: { data: { full_name: name, phone: phone } }
+    });
+    setLoading('su-submit', false, 'Create account');
+
+    if (error){
+      showError('su-error', error.message);
+      return false;
+    }
+
+    // Save district/group preference once we have a user id (profile row is auto-created by DB trigger)
+    if (data.user){
+      await sb.from('profiles').update({
+        district_cluster: district,
+        group_interest: group
+      }).eq('id', data.user.id);
+    }
+
+    document.getElementById('signupForm').style.display = 'none';
+    document.getElementById('successTitle').textContent = "You're in!";
+    document.getElementById('successSub').textContent = "Check your email to confirm your account, then log in.";
+    document.getElementById('successMsg').classList.add('show');
+    return false;
+  }
+
+  async function handleLogin(e){
+    e.preventDefault();
+    clearError('li-error');
+    var email = document.getElementById('li-email').value.trim();
+    var password = document.getElementById('li-pass').value;
+
+    setLoading('li-submit', true, 'Log in');
+    var { data, error } = await sb.auth.signInWithPassword({ email: email, password: password });
+    setLoading('li-submit', false, 'Log in');
+
+    if (error){
+      showError('li-error', error.message);
+      return false;
+    }
+
+    window.location.href = 'member.html';
+    return false;
+  }
+
+  document.getElementById('modalOverlay').addEventListener('click', function(e){
+    if(e.target === this) closeModal();
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeModal();
+  });
+
+  // Show "Member Area" instead of Sign up/Log in if already logged in
+  (async function(){
+    var { data } = await sb.auth.getSession();
+    if (data.session){
+      document.getElementById('navActions').innerHTML =
+        '<a class="btn btn-solid" href="member.html">Member Area</a>';
+    }
+  })();
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+  var clusterMap = L.map('cluster-map', { scrollWheelZoom: false }).setView([6.6335, 3.2513], 13);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 19
+  }).addTo(clusterMap);
+
+  var greenIcon = L.divIcon({
+    className: '',
+    html: '<div style="background:#1F6B33;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 0 1px #1F6B33;"></div>',
+    iconSize: [14, 14],
+    iconAnchor: [7, 7]
+  });
+
+  var clusters = [
+    { name: 'Ajasa District Cluster', stop: 'Command / White House Bus Stop', lat: 6.6448765, lng: 3.2584318 },
+    { name: 'Olakitan District Cluster', stop: 'Jerusalem / Oke Isagun Bus Stop', lat: 6.6235813, lng: 3.2571093 },
+    { name: 'Courage District Cluster', stop: 'Werewere / Isoto Bus Stop', lat: 6.6407988, lng: 3.2459757 },
+    { name: 'Ikola District Cluster', stop: 'Ikola Ilumo / Ikola Bus Stop', lat: 6.6254812, lng: 3.2455664 }
+  ];
+
+  clusters.forEach(function(c){
+    L.marker([c.lat, c.lng], { icon: greenIcon }).addTo(clusterMap)
+      .bindPopup('<b>' + c.name + '</b><br>' + c.stop);
+  });
+</script>
+
+</body>
+</html>
