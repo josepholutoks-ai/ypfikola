@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Area &mdash; Young Professionals Forum</title>
+<link rel="icon" href="logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14241C; --green-deep:#1F6B33; --green-bright:#7CC142;
+    --green-pale:#EAF5E1; --green-line:#D3E6C6; --white:#FFFFFF; --max:760px;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; font-family:'Work Sans', sans-serif; color:var(--ink); background:var(--white); line-height:1.5;}
+  h1,h2,h3{font-family:'Fraunces', serif; font-weight:600; margin:0;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 28px;}
+  header{border-bottom:1px solid var(--green-line); padding:16px 0;}
+  .nav{display:flex; align-items:center; justify-content:space-between;}
+  .brand{display:flex; align-items:center; gap:10px; text-decoration:none; color:var(--ink);}
+  .brand img{height:34px; width:34px; object-fit:contain;}
+  .brand span{font-family:'Fraunces', serif; font-weight:600;}
+  .btn{
+    font-family:'Work Sans', sans-serif; font-weight:600; font-size:0.9rem;
+    padding:9px 18px; border-radius:3px; border:1.5px solid var(--green-deep);
+    cursor:pointer; text-decoration:none; display:inline-block; background:transparent; color:var(--green-deep);
+  }
+  .btn:hover{background:var(--green-pale);}
+  main{padding:48px 0 80px;}
+  .card{border:1px solid var(--green-line); border-radius:4px; padding:32px; margin-bottom:24px;}
+  .card h2{font-size:1.3rem; margin-bottom:6px;}
+  .card p.sub{color:#5A6B57; margin:0 0 22px; font-size:0.95rem;}
+  .field{margin-bottom:16px;}
+  .field label{display:block; font-size:0.85rem; font-weight:600; margin-bottom:6px;}
+  .field input, .field select{
+    width:100%; padding:10px 12px; border:1.5px solid var(--green-line); border-radius:3px;
+    font-family:'Work Sans', sans-serif; font-size:0.95rem; background:#FBFDF9;
+  }
+  .field input[disabled]{color:#8A968A; background:#F3F6F1;}
+  .btn-solid{background:var(--green-deep); color:#fff; border-color:var(--green-deep);}
+  .btn-solid:hover{background:#195828;}
+  .status-badge{
+    display:inline-block; font-size:0.8rem; font-weight:600; padding:4px 10px; border-radius:20px;
+  }
+  .status-approved{background:var(--green-pale); color:var(--green-deep);}
+  .status-pending{background:#FDF3E3; color:#8A6516;}
+  .loading{color:#5A6B57; padding:40px 0; text-align:center;}
+  .save-msg{display:none; color:var(--green-deep); font-size:0.85rem; margin-top:10px;}
+  .save-msg.show{display:block;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav">
+    <a class="brand" href="index.html">
+      <img src="logo.png" alt="Young Professionals Forum logo">
+      <span>Young Professionals Forum</span>
+    </a>
+    <button class="btn" onclick="logout()">Log out</button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div id="loadingState" class="loading">Loading your profile…</div>
+
+  <div id="profileCard" style="display:none;">
+    <div class="card">
+      <h2 id="welcomeName">Welcome</h2>
+      <p class="sub">Your membership status: <span id="statusBadge" class="status-badge"></span></p>
+
+      <div id="adminLinkWrap" style="display:none; margin-bottom:22px;">
+        <a class="btn btn-solid" href="admin.html">Go to Admin Panel</a>
+      </div>
+
+      <form onsubmit="return saveProfile(event)">
+        <div class="field">
+          <label>Email</label>
+          <input id="p-email" type="email" disabled>
+        </div>
+        <div class="field">
+          <label for="p-phone">Phone number</label>
+          <input id="p-phone" type="tel">
+        </div>
+        <div class="field">
+          <label for="p-district">District cluster</label>
+          <select id="p-district">
+            <option>Not sure yet</option>
+            <option>Ajasa District Cluster</option>
+            <option>Olakitan District Cluster</option>
+            <option>Courage District Cluster</option>
+            <option>Ikola District Cluster</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="p-group">Group</label>
+          <select id="p-group">
+            <option>Not sure yet</option>
+            <option>Media &amp; Publicity</option>
+            <option>Prayer Band</option>
+            <option>Choir &amp; Music</option>
+            <option>Welfare</option>
+            <option>Ushering &amp; Protocol</option>
+            <option>Outreach &amp; Evangelism</option>
+          </select>
+        </div>
+        <button class="btn btn-solid" type="submit">Save changes</button>
+        <div class="save-msg" id="saveMsg">Saved.</div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="supabase-client.js"></script>
+<script>
+  var currentUserId = null;
+
+  async function init(){
+    var { data } = await sb.auth.getSession();
+    if (!data.session){
+      window.location.href = 'index.html';
+      return;
+    }
+    currentUserId = data.session.user.id;
+
+    var { data: profile, error } = await sb.from('profiles').select('*').eq('id', currentUserId).single();
+    if (error){
+      document.getElementById('loadingState').textContent = 'Could not load your profile: ' + error.message;
+      return;
+    }
+
+    document.getElementById('welcomeName').textContent = 'Welcome, ' + (profile.full_name || 'friend');
+    document.getElementById('p-email').value = profile.email || '';
+    document.getElementById('p-phone').value = profile.phone || '';
+    document.getElementById('p-district').value = profile.district_cluster || 'Not sure yet';
+    document.getElementById('p-group').value = profile.group_interest || 'Not sure yet';
+
+    var badge = document.getElementById('statusBadge');
+    if (profile.approved){
+      badge.textContent = 'Approved member';
+      badge.classList.add('status-approved');
+    } else {
+      badge.textContent = 'Pending approval';
+      badge.classList.add('status-pending');
+    }
+
+    if (profile.is_admin){
+      document.getElementById('adminLinkWrap').style.display = 'block';
+    }
+
+    document.getElementById('loadingState').style.display = 'none';
+    document.getElementById('profileCard').style.display = 'block';
+  }
+
+  async function saveProfile(e){
+    e.preventDefault();
+    var phone = document.getElementById('p-phone').value.trim();
+    var district = document.getElementById('p-district').value;
+    var group = document.getElementById('p-group').value;
+
+    var { error } = await sb.from('profiles').update({
+      phone: phone, district_cluster: district, group_interest: group
+    }).eq('id', currentUserId);
+
+    var msg = document.getElementById('saveMsg');
+    if (error){
+      msg.textContent = 'Error: ' + error.message;
+    } else {
+      msg.textContent = 'Saved.';
+    }
+    msg.classList.add('show');
+    setTimeout(function(){ msg.classList.remove('show'); }, 3000);
+    return false;
+  }
+
+  async function logout(){
+    await sb.auth.signOut();
+    window.location.href = 'index.html';
+  }
+
+  init();
+</script>
+
+</body>
+</html>
